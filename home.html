@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome, {{ current_user.name }}!</h1>
+
+<!-- AI Study Tip -->
+<section>
+  <h2>AI Study Tip</h2>
+  <a href="{{ url_for('main.study_tip') }}">
+    <button>Get Tip</button>
+  </a>
+</section>
+
+<!-- Timer -->
+<section>
+  <h2>Study Timer</h2>
+  <p id="timer">0</p>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="stopTimer()">Stop</button>
+  <button onclick="resetTimer()">Reset</button>
+</section>
+
+<!-- Goals (Placeholder, can be dynamic later) -->
+<section>
+  <h2>Your Learning Goals</h2>
+  <ul>
+    {% for goal in goals %}
+      <li>{{ goal.title }} - {{ goal.progress }}%</li>
+    {% else %}
+      <li>No goals yet. Add some!</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<!-- Link to goal page -->
+<a href="{{ url_for('goal_routes.goals') }}"><button>Manage Goals</button></a>
+
+<!-- Include Timer JS -->
+<script src="{{ url_for('static', filename='timer.js') }}"></script>
+{% endblock %}
+

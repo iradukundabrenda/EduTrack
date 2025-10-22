@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  <h2>My Learning Goals</h2>
+
+  <form action="{{ url_for('goals.add_goal') }}" method="POST">
+    <input type="text" name="title" placeholder="Goal title" required>
+    <textarea name="description" placeholder="Description"></textarea>
+    <button type="submit">Add Goal</button>
+  </form>
+
+  <ul>
+    {% for goal in goals %}
+    <li>
+      <strong>{{ goal.title }}</strong> — {{ goal.progress }}%
+      <form action="{{ url_for('goals.update_goal', goal_id=goal.id) }}" method="POST" style="display:inline;">
+        <input type="number" name="progress" value="{{ goal.progress }}" min="0" max="100">
+        <button type="submit">Update</button>
+      </form>
+      <form action="{{ url_for('goals.delete_goal', goal_id=goal.id) }}" method="POST" style="display:inline;">
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <canvas id="progressChart" width="400" height="200"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+fetch("/goals/data")
+  .then(response => response.json())
+  .then(data => {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(g => g.title),
+        datasets: [{
+          label: 'Goal Progress (%)',
+          data: data.map(g => g.progress),
+          borderWidth: 1
+        }]
+      },
+      options: { scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+  });
+</script>
+{% endblock %}
+

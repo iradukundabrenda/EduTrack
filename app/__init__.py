@@ -11,14 +11,18 @@ def create_app():
 
     db.init_app(app)
 
-    from app.models import User
-    from app.routes import main
-    app.register_blueprint(main)
+    from app.routes import main  # make sure this path is correct
+    from app.routes.goal_routes import goal_bp
 
-    # Setup login manager
+    app.register_blueprint(main)
+    app.register_blueprint(goal_bp)
+
     login_manager = LoginManager()
-    login_manager.login_view = 'main.login'
+    login_manager.login_view = 'main.login'  # <-- This must match Blueprint name + function
+    login_manager.login_message_category = 'info'
     login_manager.init_app(app)
+
+    from app.models import User
 
     @login_manager.user_loader
     def load_user(user_id):
