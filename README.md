@@ -28,45 +28,6 @@ EduTrack aims to provide an accessible and easy-to-use platform for learners to 
 - Deployment: Render or Heroku  
 
 ---
-
-## Setup & Installation
-
-1. **Clone the repository**
-
-   \`\`\`bash
-   git clone https://github.com/yourusername/edutrack.git
-   cd edutrack
-   \`\`\`
-
-2. **Create and activate a virtual environment**
-
-   \`\`\`bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   \`\`\`
-
-3. **Install dependencies**
-
-   \`\`\`bash
-   pip install -r requirements.txt
-   \`\`\`
-
-4. **Set up the database**
-
-   - For local testing, SQLite is preconfigured. For production, update \`config.py\` with your PostgreSQL URI.
-
-5. **Run the Flask app**
-
-   \`\`\`bash
-   flask run
-   \`\`\`
-
-6. **Open your browser**
-
-   Navigate to \`http://127.0.0.1:5000\` to use EduTrack locally.
-
----
-
 ## Usage
 
 - Register a new account or login.  
@@ -85,20 +46,25 @@ EduTrack aims to provide an accessible and easy-to-use platform for learners to 
 
 ---
 
+
+**Clone the repository**
+
+```bash
+git clone https://github.com/iradukundabrenda/EduTrack.git
+cd EduTrack
+
+
+---
 ## About Me
 
 Hi! I'm Brenda Iradukunda, a Computer Science and Economics major from Washington and Lee University, passionate about building impactful software and creating innovative solutions.
----
-
-## License
-
-This project is licensed under the MIT License.  
 
 ---
 
 Feel free to reach out or contribute!
 
-EOF
+
+
 
 
 
