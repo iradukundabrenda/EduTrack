@@ -1,8 +1,5 @@
 # EduTrack — Learning Progress Tracker
 
-cat > README.md << EOF
-# EduTrack — Learning Progress Tracker
-
 EduTrack is a web application designed to help learners track their study goals, progress, and study sessions through an interactive dashboard.
 EduTrack aims to provide an accessible and easy-to-use platform for learners to manage and visualize their learning journey.
 
