@@ -15,7 +15,7 @@ def create_app():
     from app.routes.goal_routes import goal_bp
 
     app.register_blueprint(main)
-    app.register_blueprint(goal_bp)
+    app.register_blueprint(goal_bp, url_prefix="/goals")
 
     login_manager = LoginManager()
     login_manager.login_view = 'main.login'  # <-- This must match Blueprint name + function

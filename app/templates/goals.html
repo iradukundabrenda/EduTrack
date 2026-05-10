@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduTrack — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+    /* NAV */
+    nav {
+      background: #1a1a2e;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo { color: #4cc9f0; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.05em; }
+    .nav-user { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+    .nav-logout { color: #f72585; font-size: 0.8rem; text-decoration: none; margin-left: 1.5rem; border: 1px solid #f72585; padding: 0.3rem 0.8rem; border-radius: 20px; transition: all 0.2s; }
+    .nav-logout:hover { background: #f72585; color: white; }
+
+    /* LAYOUT */
+    .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    /* STATS ROW */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-bottom: 2.5rem; }
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .stat-icon.blue { background: #e0f0ff; }
+    .stat-icon.green { background: #e0fff0; }
+    .stat-icon.purple { background: #f0e0ff; }
+    .stat-num { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; line-height: 1; }
+    .stat-label { font-size: 0.78rem; color: #888; margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* MAIN GRID */
+    .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+
+    /* CARD */
+    .card { background: white; border-radius: 16px; padding: 1.8rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .card-title { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card-title span { color: #4cc9f0; }
+
+    /* ADD GOAL FORM */
+    .add-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .add-form input {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      transition: border 0.2s;
+      outline: none;
+    }
+    .add-form input:focus { border-color: #4cc9f0; }
+    .btn-add {
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #4cc9f0, #4361ee);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-add:hover { opacity: 0.88; }
+
+    /* GOAL CARDS */
+    .goal-list { display: flex; flex-direction: column; gap: 1rem; }
+    .goal-card {
+      border: 1.5px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .goal-card:hover { border-color: #4cc9f0; box-shadow: 0 4px 16px rgba(76,201,240,0.1); }
+    .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; }
+    .goal-title { font-weight: 600; font-size: 0.95rem; color: #1a1a2e; }
+    .goal-desc { font-size: 0.78rem; color: #aaa; margin-top: 0.2rem; }
+    .goal-actions { display: flex; gap: 0.4rem; }
+    .progress-bar-wrap { background: #f0f2f5; border-radius: 999px; height: 8px; margin-bottom: 0.7rem; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4cc9f0, #4361ee); transition: width 0.4s; }
+    .goal-footer { display: flex; justify-content: space-between; align-items: center; }
+    .progress-pct { font-size: 0.78rem; font-weight: 600; color: #4361ee; }
+    .update-form { display: flex; align-items: center; gap: 0.4rem; }
+    .update-form input {
+      width: 60px;
+      padding: 0.3rem 0.5rem;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+    .btn-update {
+      padding: 0.3rem 0.7rem;
+      background: #4361ee;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .btn-delete {
+      padding: 0.3rem 0.7rem;
+      background: #fff0f3;
+      color: #f72585;
+      border: 1px solid #ffd6e7;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .empty { text-align: center; color: #bbb; padding: 2rem; font-size: 0.9rem; }
+
+    /* CHART CARD */
+    .chart-wrap { position: relative; height: 260px; }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .badge.done { background: #e0fff0; color: #00b894; }
+    .badge.progress { background: #e0f0ff; color: #4361ee; }
+    .badge.notstarted { background: #f5f5f5; color: #aaa; }
+
+    @media (max-width: 768px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">📚 EduTrack</div>
+  <div style="display:flex;align-items:center;">
+    <span class="nav-user">Hi, {{ current_user.name }}</span>
+    <a href="{{ url_for('main.logout') }}" class="nav-logout">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-icon blue">🎯</div>
+      <div>
+        <div class="stat-num">{{ goals|length }}</div>
+        <div class="stat-label">Total Goals</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div>
+        <div class="stat-num">{{ goals|selectattr('progress', 'equalto', 100)|list|length }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">📈</div>
+      <div>
+        <div class="stat-num">{{ ((goals|sum(attribute='progress') / goals|length) if goals else 0)|int }}%</div>
+        <div class="stat-label">Avg Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- LEFT: GOALS -->
+    <div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">➕ <span>Add New Goal</span></div>
+        <form action="{{ url_for('goals.add_goal') }}" method="POST" class="add-form">
+          <input type="text" name="title" placeholder="Goal title e.g. Learn Python" required />
+          <input type="text" name="description" placeholder="Description (optional)" />
+          <button type="submit" class="btn-add">Add Goal</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 <span>My Goals</span></div>
+        <div class="goal-list">
+          {% if goals %}
+            {% for g in goals %}
+            <div class="goal-card">
+              <div class="goal-header">
+                <div>
+                  <div class="goal-title">{{ g.title }}</div>
+                  {% if g.description %}<div class="goal-desc">{{ g.description }}</div>{% endif %}
+                </div>
+                <span class="badge {% if g.progress == 100 %}done{% elif g.progress > 0 %}progress{% else %}notstarted{% endif %}">
+                  {% if g.progress == 100 %}Done{% elif g.progress > 0 %}In Progress{% else %}Not Started{% endif %}
+                </span>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style="width: {{ g.progress }}%"></div>
+              </div>
+              <div class="goal-footer">
+                <span class="progress-pct">{{ g.progress }}% complete</span>
+                <div class="update-form" style="display:flex;gap:0.4rem;align-items:center;">
+                  <form action="{{ url_for('goals.update_goal', goal_id=g.id) }}" method="POST" style="display:flex;gap:0.4rem;">
+                    <input type="number" name="progress" value="{{ g.progress }}" min="0" max="100" />
+                    <button type="submit" class="btn-update">Update</button>
+                  </form>
+                  <form action="{{ url_for('goals.delete_goal', goal_id=g.id) }}" method="POST">
+                    <button type="submit" class="btn-delete">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty">No goals yet — add your first one above! 🚀</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CHART -->
+    <div>
+      <div class="card">
+        <div class="card-title">📊 <span>Progress Chart</span></div>
+        <div class="chart-wrap">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+fetch("{{ url_for('goals.goals_data') }}")
+  .then(res => res.json())
+  .then(data => {
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.title),
+        datasets: [{
+          label: 'Progress %',
+          data: data.map(d => d.progress),
+          backgroundColor: data.map(d =>
+            d.progress === 100 ? 'rgba(0,184,148,0.7)' :
+            d.progress > 0 ? 'rgba(67,97,238,0.7)' :
+            'rgba(200,200,200,0.5)'
+          ),
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, max: 100, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

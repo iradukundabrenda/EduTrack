@@ -10,8 +10,37 @@ main = Blueprint('main', __name__)
 def index():
     return redirect(url_for("main.login"))
 
+@main.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("goals.list_goals"))
+        flash("Invalid email or password.")
+    return render_template("login.html")
+
 @main.route("/register", methods=["GET", "POST"])
 def register():
-    ...
-# (rest of your login/logout/home routes)
+    if request.method == "POST":
+        email = request.form.get("email")
+        name = request.form.get("name")
+        password = generate_password_hash(request.form.get("password"))
+        user = User(email=email, name=name, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for("main.login"))
+    return render_template("register.html")
 
+@main.route("/home")
+@login_required
+def home():
+    return render_template("home.html")
+
+@main.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("main.login"))
